@@ -24,9 +24,17 @@ function MakeGreen(...) "{{{1
   let arg_count = a:0
 
   if exists("g:makegreen_stay_on_file") && g:makegreen_stay_on_file
-    let make_command = "make!"
-  else
-    let make_command = "make"
+    if exists(":Neomake")
+        let make_command = "Neomake!"
+      else
+        let make_command = "make!"
+      endif
+    else
+      if exists(":Neomake")
+        let make_command = "Neomake"
+      else
+        let make_command = "make"
+    endif
   endif
 
   silent! w " TODO: configuration option?
