@@ -20,31 +20,37 @@ set cpo&vim
 hi GreenBar term=reverse ctermfg=white ctermbg=green guifg=white guibg=green
 hi RedBar   term=reverse ctermfg=white ctermbg=red guifg=white guibg=red
 
-function MakeGreen(...) "{{{1
+function! MakeGreen(...) "{{{1
   let arg_count = a:0
 
-  if exists("g:makegreen_stay_on_file") && g:makegreen_stay_on_file
-    if exists(":Neomake")
-        let make_command = "Neomake!"
-      else
-        let make_command = "make!"
-      endif
-    else
-      if exists(":Neomake")
-        let make_command = "Neomake"
-      else
-        let make_command = "make"
-    endif
+  " Make sure a command isn't running
+  if exists("s:error_var")
+    echoerr 'Makegreen is already running!'
+    return
   endif
+  let s:error_var = ''
 
   silent! w " TODO: configuration option?
   if arg_count
-    silent! exec make_command . " " . a:1
+    call async#job#start(split(&makeprg . " " . a:1), {
+      \'on_exit': function('s:CompletionCallBack'),
+      \ 'on_stdout': function('s:handler'),
+      \ 'on_stderr': function('s:handler')
+    \})
   else
-    silent! exec make_command
+    let job_id = async#job#start(split(&makeprg), {
+      \'on_exit': function('s:CompletionCallBack')
+    \})
   endif
+endfunction
+"}}}1
 
-  redraw!
+function! s:handler(job_id, data, event_type)
+    let s:error_var = s:error_var . join(a:data, "\n")
+endfunction
+
+function! s:CompletionCallBack(...) "{{{1
+  silent cexpr! s:error_var
 
   let error = s:GetFirstError()
   if error != ''
@@ -52,11 +58,12 @@ function MakeGreen(...) "{{{1
   else
     call s:Bar("green","All tests passed")
   endif
+  unlet s:error_var
 endfunction
 "}}}1
 "
 " Utility Functions" {{{1
-function s:GetFirstError()
+function! s:GetFirstError()
   if getqflist() == []
     return ''
   endif
@@ -75,7 +82,7 @@ function s:GetFirstError()
   return error_message
 endfunction
 
-function s:Bar(type, msg)
+function! s:Bar(type, msg)
   if a:type == "red"
     echohl RedBar
   else
@@ -85,7 +92,7 @@ function s:Bar(type, msg)
   echohl None
 endfunction
 
-:command -nargs=* MakeGreen :call MakeGreen(<q-args>)
+:command! -nargs=* MakeGreen :call MakeGreen(<q-args>)
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
