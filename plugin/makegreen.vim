@@ -59,6 +59,11 @@ function! s:CompletionCallBack(...) "{{{1
     call s:Bar("green","All tests passed")
   endif
   unlet s:error_var
+
+  if exists("g:makegreen_stay_on_file") && g:makegreen_stay_on_file
+    cc!
+  endif
+
 endfunction
 "}}}1
 "

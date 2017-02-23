@@ -207,6 +207,7 @@ Contributors                                       *makegreen-contributors*
 
 Rein Henrichs
 Gary Bernhardt
+Logan Kopas
 
 
 License                                                 *makegreen-license*
