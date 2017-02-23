@@ -60,7 +60,7 @@ function! s:CompletionCallBack(...) "{{{1
   endif
   unlet s:error_var
 
-  if exists("g:makegreen_stay_on_file") && g:makegreen_stay_on_file
+  if !(exists("g:makegreen_stay_on_file") && g:makegreen_stay_on_file)
     cc!
   endif
 
