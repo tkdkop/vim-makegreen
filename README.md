@@ -17,7 +17,7 @@ Plug 'prabirshrestha/async.vim'
 Plug 'tkdkop/vim-makegreen'
 ```
 
-This plugin uses the 'prabirshrestha/async.vim' to normalize async functionality across 
+This plugin uses the [prabirshrestha/async.vim](https://github.com/prabirshrestha/async.vim) plugin to normalize async functionality across 
 vim and neovim.
 
 Usage
